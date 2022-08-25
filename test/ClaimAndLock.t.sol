@@ -153,5 +153,3 @@ contract ClaimAndLockTest is Addresses, MerkleProofFile, ClaimAndLock {
         assertEq(balBeforeGNOinMerkle - amountToClaimGNO80, balAfterGNOinMerkle);
     }
 }
-
-// forge test --fork-url "https://eth-mainnet.alchemyapi.io/v2/98WsmgUS7hN0dAjOLyu1-i-nsjoott_X" --etherscan-api-key 6TZZN635QSPNJVF1QJH9ANF53FP1Y3DRN9 --fork-block-number 15408000 --match-contract ClaimAndLock  -vvvv
