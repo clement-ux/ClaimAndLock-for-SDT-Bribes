@@ -55,13 +55,27 @@ contract ClaimAndLock {
     /// @param claims List containing claimParam structure argument needed for claimMulti 
     /// @param lock Boolean to lock or not SDT (if token == SDT)
     function claimAndLockMulti(address account, IMultiMerkleStash.claimParam[] memory claims, bool lock) external{
+        //claim all bribes token
         IMultiMerkleStash(multiMerkleStash).claimMulti(account, claims);
-        for (uint256 i = 0; i < claims.length; ++i) {
-            if (claims[i].token == SDT && lock){
-                IERC20(SDT).transferFrom(account, address(this), claims[i].amount);
-                IVeSDT(VE_SDT).deposit_for(account, claims[i].amount);
+
+        // find amount of SDT claimed
+        uint256 amountSDT = 0;
+        uint256 length = claims.length;
+        for (uint256 i = 0; i < length;) {
+            if (claims[i].token == SDT){
+                amountSDT = claims[i].amount;
+                break;
+            }
+            unchecked {
+                ++i;
             }
         }
-    }
 
+        // lock SDT 
+        if (lock) {
+            IERC20(SDT).transferFrom(account, address(this), amountSDT);
+            IVeSDT(VE_SDT).deposit_for(account, amountSDT);
+        }
+        
+    }
 }

@@ -35,8 +35,8 @@ contract ClaimAndLockTest is Addresses, MerkleProofFile, ClaimAndLock {
         generateMerkleProof();
         claimParamSDT2 = IMultiMerkleStash.claimParam(SDT,claimerSDT2Index,amountToClaimSDT2, merkleProofSDT2);
         claimParamGNO80 = IMultiMerkleStash.claimParam(GNO,claimerGNO80Index,amountToClaimGNO80, merkleProofGNO80);
-        claimParamList.push(claimParamSDT2);
         claimParamList.push(claimParamGNO80);
+        claimParamList.push(claimParamSDT2);
     }
     
     function testClaimAndLockSDT() public {
