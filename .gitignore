@@ -1,7 +1,9 @@
 cache/
 out/
+broadcast/
 .vscode
 .idea
+.env
 .github/
 lcov.info
 lib/openzeppelin-contracts
