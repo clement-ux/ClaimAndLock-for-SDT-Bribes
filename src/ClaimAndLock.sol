@@ -2,18 +2,10 @@
 pragma solidity ^0.8.16;
 
 import "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import "script/interface/IMultiMerkleStash.sol";
-import "script/interface/IVeSDT.sol";
+import "src/interface/IMultiMerkleStash.sol";
+import "src/interface/IVeSDT.sol";
 
 contract ClaimAndLock {
-
-    struct ClaimParam {
-      address token;
-      uint256 index;
-      uint256 amount;
-      bytes32[] merkleProof;
-      bool lock;
-    }
 
     address public multiMerkleStash =
         address(0x03E34b085C52985F6a5D27243F20C84bDdc01Db4);
@@ -56,22 +48,19 @@ contract ClaimAndLock {
         }
     }
 
-    /// @notice Grouping multiples bribes for same accounts 
+    /// @notice Grouping tx for Claiming SDT from bribes and Lock it on veSDT
+    /// @dev For locking SDT into veSDT, account should already have some veSDT
+    /// @dev Can't lock SDT into veSDT for first time here
     /// @param account Address of the bribes receiver
-    /// @param claims List of structure ClaimParam
-    function claimAndLockMulti(
-        address account, 
-        ClaimParam[] calldata claims
-    ) external {
-        for(uint256 i=0;i<claims.length;++i) {
-            claimAndLock(
-                claims[i].token, 
-                claims[i].index, 
-                account, 
-                claims[i].amount, 
-                claims[i].merkleProof, 
-                claims[i].lock
-            );
+    /// @param claims List containing claimParam structure argument needed for claimMulti 
+    /// @param lock Boolean to lock or not SDT (if token == SDT)
+    function claimAndLockMulti(address account, IMultiMerkleStash.claimParam[] memory claims, bool lock) external{
+        IMultiMerkleStash(multiMerkleStash).claimMulti(account, claims);
+        for (uint256 i = 0; i < claims.length; ++i) {
+            if (claims[i].token == SDT && lock){
+                IERC20(SDT).transferFrom(account, address(this), claims[i].amount);
+                IVeSDT(VE_SDT).deposit_for(account, claims[i].amount);
+            }
         }
     }
 
