@@ -100,3 +100,15 @@ contract ClaimAndLockV2Test is Addresses, MerkleProofFile {
 	// new version gas : 327237 (-369)
 	// old version gas : 327606
 }
+
+
+/* ---- Gas study ---- */
+
+// 				With private function  	| Without private function
+// Deployement : 			436632	 	|		480076 ❌
+// ClaimSimple : 			277759  	|		277730 ✅
+// ClaimMulti  : 			327266  	|		327237 ✅	
+
+// 				 	With diff balance 	| With for loop 
+// Deployement : 			511707 		| 		480076 ✅
+// ClaimMulti  : 			328559		| 		327237 ✅

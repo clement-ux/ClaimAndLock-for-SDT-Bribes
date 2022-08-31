@@ -5,6 +5,7 @@ testing :;
 	--fork-url "${MAINNET}" \
 	--etherscan-api-key ${ETHERSCAN_KEY} \
 	--fork-block-number 15408001 \
-	--match-contract Claim \
+	--match-contract ClaimAndLockV2 \
 	--match-test test \
+	--gas-report \
 	-vv

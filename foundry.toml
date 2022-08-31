@@ -4,6 +4,6 @@ out = 'out'
 libs = ['lib']
 
 gas_reports = ["*"]
-gas_reports_ignore = ["Vyper_contract","GnosisToken","SDT","TransparentUpgradeableProxy"]
+gas_reports_ignore = ["Vyper_contract","GnosisToken","SDT","TransparentUpgradeableProxy","MultiMerkleStash"]
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
