@@ -39,7 +39,7 @@ contract ClaimAndLockTest is Addresses, MerkleProofFile {
 	}
 
 	function testClaimAndLockSDT() public {
-		vm.prank(claimerSDT2);
+		vm.startPrank(claimerSDT2);
 		sdt.approve(address(claimAndLockContract), type(uint256).max);
 
 		uint256 balBeforeVeSDTClaimer = veSDT.balanceOf(claimerSDT2);
@@ -47,7 +47,7 @@ contract ClaimAndLockTest is Addresses, MerkleProofFile {
 		uint256 balBeforeSDTinMerkle = sdt.balanceOf(multiMerkleStash);
 		bool claimedBefore = merkle.isClaimed(SDT, claimerSDT2Index);
 
-		claimAndLockContract.claimAndLock(SDT, claimerSDT2Index, claimerSDT2, amountToClaimSDT2, merkleProofSDT2, true);
+		claimAndLockContract.claimAndLockSDT(claimerSDT2Index, amountToClaimSDT2, merkleProofSDT2);
 
 		uint256 balAfterSDTClaimer = veSDT.balanceOf(claimerSDT2);
 		uint256 balAfterSDTinVeSDT = sdt.balanceOf(VE_SDT);
@@ -61,45 +61,11 @@ contract ClaimAndLockTest is Addresses, MerkleProofFile {
 		assertEq(balBeforeSDTinMerkle - amountToClaimSDT2, balAfterSDTinMerkle);
 	}
 
-	function testClaimAndNoLockSDT() public {
-		uint256 balBeforeSDTClaimer = sdt.balanceOf(claimerSDT2);
-		uint256 balBeforeSDTinVeSDT = sdt.balanceOf(VE_SDT);
-		uint256 balBeforeSDTinMerkle = sdt.balanceOf(multiMerkleStash);
-		bool claimedBefore = merkle.isClaimed(SDT, claimerSDT2Index);
-
-		claimAndLockContract.claimAndLock(SDT, claimerSDT2Index, claimerSDT2, amountToClaimSDT2, merkleProofSDT2, false);
-
-		uint256 balAfterSDTClaimer = sdt.balanceOf(claimerSDT2);
-		uint256 balAfterSDTinVeSDT = sdt.balanceOf(VE_SDT);
-		uint256 balAfterSDTinMerkle = sdt.balanceOf(multiMerkleStash);
-		bool claimedAfter = merkle.isClaimed(SDT, claimerSDT2Index);
-
-		assertEq(claimedBefore, false);
-		assertEq(claimedAfter, true);
-		assertEq(balAfterSDTClaimer - balBeforeSDTClaimer, amountToClaimSDT2);
-		assertEq(balBeforeSDTinVeSDT, balAfterSDTinVeSDT);
-		assertEq(balBeforeSDTinMerkle - amountToClaimSDT2, balAfterSDTinMerkle);
-	}
-
-	function testClaimAndLockGNO() public {
-		uint256 balBeforeGNOClaimer = gno.balanceOf(claimerGNO80);
-		uint256 balBeforeGNOinMerkle = gno.balanceOf(multiMerkleStash);
-		bool claimedBefore = merkle.isClaimed(GNO, claimerGNO80Index);
-
-		claimAndLockContract.claimAndLock(GNO, claimerGNO80Index, claimerGNO80, amountToClaimGNO80, merkleProofGNO80, true);
-
-		uint256 balAfterGNOClaimer = gno.balanceOf(claimerGNO80);
-		uint256 balAfterGNOinMerkle = gno.balanceOf(multiMerkleStash);
-		bool claimedAfter = merkle.isClaimed(GNO, claimerGNO80Index);
-
-		assertEq(claimedBefore, false);
-		assertEq(claimedAfter, true);
-		assertTrue(balAfterGNOClaimer - balBeforeGNOClaimer > 0);
-		assertEq(balBeforeGNOinMerkle - amountToClaimGNO80, balAfterGNOinMerkle);
-	}
+	// new version gas : 277730 (-495)
+	// old version gas : 278225
 
 	function testClaimAndLockMulti() public {
-		vm.prank(claimerSDT2);
+		vm.startPrank(claimerSDT2);
 		sdt.approve(address(claimAndLockContract), type(uint256).max);
 
 		uint256 balBeforeVeSDTClaimer = veSDT.balanceOf(claimerSDT2);
@@ -110,7 +76,7 @@ contract ClaimAndLockTest is Addresses, MerkleProofFile {
 		bool claimedBeforeSDT = merkle.isClaimed(SDT, claimerSDT2Index);
 		bool claimedBeforeGNO = merkle.isClaimed(GNO, claimerGNO80Index);
 
-		claimAndLockContract.claimAndLockMulti(claimerSDT2, claimParamList, true);
+		claimAndLockContract.claimAndLockMulti(claimParamList);
 
 		uint256 balAfterVeSDTClaimer = veSDT.balanceOf(claimerSDT2);
 		uint256 balAfterSDTinVeSDT = sdt.balanceOf(VE_SDT);
@@ -131,35 +97,17 @@ contract ClaimAndLockTest is Addresses, MerkleProofFile {
 		assertTrue(balAfterGNOClaimer - balBeforeGNOClaimer > 0);
 		assertEq(balBeforeGNOinMerkle - amountToClaimGNO80, balAfterGNOinMerkle);
 	}
-
-	function testClaimAndNoLockMulti() public {
-		uint256 balBeforeSDTClaimer = sdt.balanceOf(claimerSDT2);
-		uint256 balBeforeSDTinVeSDT = sdt.balanceOf(VE_SDT);
-		uint256 balBeforeSDTinMerkle = sdt.balanceOf(multiMerkleStash);
-		uint256 balBeforeGNOClaimer = gno.balanceOf(claimerGNO80);
-		uint256 balBeforeGNOinMerkle = gno.balanceOf(multiMerkleStash);
-		bool claimedBeforeSDT = merkle.isClaimed(SDT, claimerSDT2Index);
-		bool claimedBeforeGNO = merkle.isClaimed(GNO, claimerGNO80Index);
-
-		claimAndLockContract.claimAndLockMulti(claimerSDT2, claimParamList, false);
-
-		uint256 balAfterSDTClaimer = sdt.balanceOf(claimerSDT2);
-		uint256 balAfterSDTinVeSDT = sdt.balanceOf(VE_SDT);
-		uint256 balAfterSDTinMerkle = sdt.balanceOf(multiMerkleStash);
-		uint256 balAfterGNOClaimer = gno.balanceOf(claimerGNO80);
-		uint256 balAfterGNOinMerkle = gno.balanceOf(multiMerkleStash);
-		bool claimedAfterSDT = merkle.isClaimed(SDT, claimerSDT2Index);
-		bool claimedAfterGNO = merkle.isClaimed(GNO, claimerGNO80Index);
-
-		assertEq(claimedBeforeSDT, false);
-		assertEq(claimedAfterSDT, true);
-		assertEq(balAfterSDTClaimer - amountToClaimSDT2, balBeforeSDTClaimer);
-		assertEq(balBeforeSDTinVeSDT, balAfterSDTinVeSDT);
-		assertEq(balBeforeSDTinMerkle - amountToClaimSDT2, balAfterSDTinMerkle);
-
-		assertEq(claimedBeforeGNO, false);
-		assertEq(claimedAfterGNO, true);
-		assertTrue(balAfterGNOClaimer - balBeforeGNOClaimer > 0);
-		assertEq(balBeforeGNOinMerkle - amountToClaimGNO80, balAfterGNOinMerkle);
-	}
+	// new version gas : 327237 (-369)
+	// old version gas : 327606
 }
+
+/* ---- Gas study ---- */
+
+// 				With private function  	| Without private function
+// Deployement : 			436632	 	|		480076 ❌
+// ClaimSimple : 			277759  	|		277730 ✅
+// ClaimMulti  : 			327266  	|		327237 ✅
+
+// 				 	With diff balance 	| With for loop
+// Deployement : 			511707 		| 		480076 ✅
+// ClaimMulti  : 			328559		| 		327237 ✅
